@@ -93,7 +93,7 @@ dotnet build --configuration Release --no-restore
 
 #### Mac
 
-1. Download the latest version of [BepInEx_macos_x64](https://github.com/BepInEx/BepInEx/releases) (BepInEx 5)and extract it to `Hearthstone/`
+1. Download the latest version of [BepInEx_macos_universal](https://github.com/BepInEx/BepInEx/releases) (BepInEx 5)and extract it to `Hearthstone/`
 
 2. Copy all `dll` which under the project folder `HsMod/UnstrippedCorlibUnix` (`cp HsMod/UnstrippedCorlibUnix/* /Applications/Hearthstone/BepInEx/unstripped_corlib/` ). ( PS. Mono and Unity version must same as Hearthstone ).
 
