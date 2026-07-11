@@ -393,7 +393,8 @@
     <Compile Include="LocalizationManager.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Patcher.cs" />
-    <Compile Include="Patches\*.cs" />
+    <Compile Include="Patches\Helpers.cs" />
+    <Compile Include="Patches\*.cs" Exclude="Patches\Helpers.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
