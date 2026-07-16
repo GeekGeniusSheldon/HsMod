@@ -31,6 +31,7 @@ namespace HsMod
         public static ConfigEntry<bool> isRewardToastShow;
         public static ConfigEntry<bool> isAutoOpenBoxesRewardEnable;
         public static ConfigEntry<bool> isFullnameShow;
+        public static ConfigEntry<bool> isBlockStreamerMode;
         public static ConfigEntry<bool> isOpponentRankInGameShow;
         public static ConfigEntry<bool> isSkipHeroIntro;
         public static ConfigEntry<bool> isThinkEmotesEnable;
@@ -235,6 +236,7 @@ namespace HsMod
 
             isQuickModeEnable = config.Bind(LocalizationManager.GetLangValue("isQuickModeEnable.label"), LocalizationManager.GetLangValue("isQuickModeEnable.name"), false, LocalizationManager.GetLangValue("isQuickModeEnable.description"));
             isFullnameShow = config.Bind(LocalizationManager.GetLangValue("isFullnameShow.label"), LocalizationManager.GetLangValue("isFullnameShow.name"), false, LocalizationManager.GetLangValue("isFullnameShow.description"));
+            isBlockStreamerMode = config.Bind(LocalizationManager.GetLangValue("isBlockStreamerMode.label"), LocalizationManager.GetLangValue("isBlockStreamerMode.name"), false, LocalizationManager.GetLangValue("isBlockStreamerMode.description"));
             isOpponentRankInGameShow = config.Bind(LocalizationManager.GetLangValue("isOpponentRankInGameShow.label"), LocalizationManager.GetLangValue("isOpponentRankInGameShow.name"), false, LocalizationManager.GetLangValue("isOpponentRankInGameShow.description"));
             isCardTrackerEnable = config.Bind(LocalizationManager.GetLangValue("isCardTrackerEnable.label"), LocalizationManager.GetLangValue("isCardTrackerEnable.name"), false, LocalizationManager.GetLangValue("isCardTrackerEnable.description"));
             isCardRevealedEnable = config.Bind(LocalizationManager.GetLangValue("isCardRevealedEnable.label"), LocalizationManager.GetLangValue("isCardRevealedEnable.name"), false, LocalizationManager.GetLangValue("isCardRevealedEnable.description"));

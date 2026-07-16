@@ -79,6 +79,7 @@ Open the settings in-game with `Esc` -> **Mod Settings**. Full steps and other p
 - Emote without cooldown (minimum 1.5s interval) and emote shortcut keys.
 - Block the opponent's card effects individually.
 - Display the opponent's full Battle.net nickname, and add opponents in matchmaking.
+- Block streamer mode: force it off and block the accidental Ctrl+Shift+S toggle that replaces player names with hero names.
 - Retrieve tavern player nicknames by clicking their avatar.
 - Display the opponent's ladder rank before Legend.
 - Mark the opponent's known cards.

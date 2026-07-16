@@ -88,6 +88,14 @@ namespace HsMod
                 TimeScaleMgr.Get().Update();
             };
 
+            isBlockStreamerMode.SettingChanged += delegate
+            {
+                //开启时立即关闭已保存的主播模式
+                if (isBlockStreamerMode.Value)
+                {
+                    try { Options.Get()?.SetBool(Option.STREAMER_MODE, false); } catch { }
+                }
+            };
             isShowCardLargeCount.SettingChanged += delegate
             {
                 if (isShowCardLargeCount.Value)
