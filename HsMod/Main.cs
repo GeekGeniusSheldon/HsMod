@@ -179,11 +179,27 @@ namespace HsMod
 
         private void Update()
         {
-            // todo: check game status
-            if ((autoQuitTimer.Value > 0) && (ConfigValue.Get().RunningTime >= (autoQuitTimer.Value + 1818)))
+            // 定时退出：到点后不在对局中立即退出；对局中等待结算退出（见 PatchEndGameScreenShow），超时 1818 秒兜底强制退出
+            if ((autoQuitTimer.Value > 0) && (ConfigValue.Get().RunningTime >= autoQuitTimer.Value))
             {
-                Utils.MyLogger(BepInEx.Logging.LogLevel.Warning, "Force Auto Quit...");
-                Utils.Quit();
+                bool busyInGame = false;
+                try
+                {
+                    busyInGame = (SceneMgr.Get()?.GetMode() == SceneMgr.Mode.GAMEPLAY && GameState.Get()?.IsGameOver() == false)
+                        || SceneMgr.Get()?.IsTransitioning() == true
+                        || GameMgr.Get()?.IsFindingGame() == true;
+                }
+                catch { }
+                if (!busyInGame)
+                {
+                    Utils.MyLogger(BepInEx.Logging.LogLevel.Warning, "Auto Quit...");
+                    Utils.Quit();
+                }
+                else if (ConfigValue.Get().RunningTime >= (autoQuitTimer.Value + 1818))
+                {
+                    Utils.MyLogger(BepInEx.Logging.LogLevel.Warning, "Force Auto Quit...");
+                    Utils.Quit();
+                }
             }
 
             if (Input.GetKeyUp(KeyCode.F4))
