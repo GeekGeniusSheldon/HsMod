@@ -11,7 +11,7 @@ Hearthstone Modification based on BepInEx. The plugin source code is at [github.
 
 HsMod is based on [Simplified Chinese](https://github.com/Pik-4/HsMod/blob/bepinex5/[CHS]ReadMe.md); the English version may contain translation errors. You can edit the JSON files in `HsMod/Languages` and recompile to support your region's language. The plugin is not yet fully translated.
 
-**[Documentation Wiki](docs-wiki/README.md)** covers installation, every setting, hotkeys and troubleshooting in detail.
+**[Documentation Wiki](../../wiki)** covers installation, every setting, hotkeys and troubleshooting in detail.
 
 ## Quick start (Windows)
 
@@ -21,7 +21,7 @@ HsMod is based on [Simplified Chinese](https://github.com/Pik-4/HsMod/blob/bepin
 4. In `doorstop_config.ini`, set `dll_search_path_override = BepInEx\unstripped_corlib`.
 5. Put `HsMod.dll` in `Hearthstone\BepInEx\plugins`, then launch.
 
-Open the settings in-game with `Esc` -> **Mod Settings**. Full steps and other platforms are in [Installation](docs-wiki/Installation.md).
+Open the settings in-game with `Esc` -> **Mod Settings**. Full steps and other platforms are in [Installation](../../wiki/Installation).
 
 ## Contents
 
