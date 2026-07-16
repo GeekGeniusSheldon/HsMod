@@ -397,6 +397,7 @@
     <Compile Include="Patches\*.cs" Exclude="Patches\Helpers.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ModSettingsUI.cs" />
+    <Compile Include="BgPetSpoofer.cs" />
     <Compile Include="BgRankOverlay.cs" />
     <Compile Include="BgSessionStats.cs" />
     <Compile Include="BgAutoSquelch.cs" />

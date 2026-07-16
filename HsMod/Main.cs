@@ -172,6 +172,9 @@ namespace HsMod
             //酒馆战棋自动静默
             BgAutoSquelch.Init();
 
+            // Local display for unowned Battlegrounds pets
+            BgPetSpoofer.Init();
+
             //启动web服务
             WebServer.Start();
 
@@ -216,7 +219,11 @@ namespace HsMod
                 WebServer.Restart();
             }
 
+            // Keep the local Battlegrounds pet lifecycle independent of hotkey input.
+            BgPetSpoofer.Tick();
+
             if (!isPluginEnable.Value) return;
+
             if (ModSettingsUI.IsVisible) return;    //配置菜单打开时禁用快捷键，避免输入文本触发
             if (!isShortcutsEnable.Value || !Input.anyKey) return;
             else
@@ -462,6 +469,7 @@ namespace HsMod
 
         private void OnDestroy()
         {
+            BgPetSpoofer.Shutdown();
             // PatchManager.UnPatchAll();
         }
 

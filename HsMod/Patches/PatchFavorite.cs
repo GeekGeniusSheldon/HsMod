@@ -527,7 +527,8 @@ namespace HsMod
                 if (!IsBgsLocalCollectionFavoriteOverrideEnabled() || skinPet.Value == -1)
                     return true;
 
-                petVariantId = skinPet.Value;
+                // Keep the selected pet out of FindGame and render it locally through BgPetSpoofer.
+                petVariantId = null;
                 deckPetVariantId = null;
                 return false;
             }
@@ -617,6 +618,7 @@ namespace HsMod
                 {
                     if (skinPet.Value != -1)
                     {
+                        // The pet-corner marker is decorative; the model is provided locally or by the game.
                         Player playerBySide2 = GameState.Get()?.GetPlayerBySide(Player.Side.FRIENDLY);
                         playerBySide2?.SetTag(GAME_TAG.PET_VARIANT_ID, skinPet.Value);
                     }
