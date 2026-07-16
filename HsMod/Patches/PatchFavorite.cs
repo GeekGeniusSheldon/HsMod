@@ -18,6 +18,22 @@ namespace HsMod
                 return isBgsUnlockCollectionEnable.Value;
             }
 
+            [HarmonyPrefix]
+            [HarmonyPatch(typeof(PetControllerGame), "InitializeTreat")]
+            [HarmonyPatch(typeof(PetControllerGame), "InitializeToy")]
+            public static bool PatchLocalPetItemInitialization()
+            {
+                return !BgPetSpoofer.IsInitializingLocalPet;
+            }
+
+            [HarmonyPrefix]
+            [HarmonyPatch(typeof(Network), "RequestGeneratePetTreat")]
+            [HarmonyPatch(typeof(Network), "RequestFeedPet")]
+            public static bool PatchLocalPetTreatRequests()
+            {
+                return !BgPetSpoofer.IsInitializingLocalPet;
+            }
+
             private static void SetBgsBoardFavoriteState(Hearthstone.DataModels.BattlegroundsBoardSkinCollectionPageDataModel pageModel, int favoriteDbid)
             {
                 if (pageModel?.BoardSkinList == null)

@@ -5,7 +5,7 @@ using static HsMod.PluginConfig;
 
 namespace HsMod
 {
-    // Local-only Battlegrounds pet. The controller is initialized without calling
+    // Local-only Battlegrounds pet and items. The controller is initialized without calling
     // PetControllerGame.CreatePetObject(), because that method sends a level override request.
     public static class BgPetSpoofer
     {
@@ -22,15 +22,24 @@ namespace HsMod
         private static readonly PropertyInfo PetVariantIdProperty = typeof(PetControllerBoard).GetProperty("PetVariantId", InstanceMembers);
         private static readonly PropertyInfo PlayerIdProperty = typeof(PetControllerBoard).GetProperty("PlayerId", InstanceMembers);
         private static readonly PropertyInfo IsOverridenProperty = typeof(PetControllerBoard).GetProperty("IsOverriden", InstanceMembers);
+        private static readonly PropertyInfo TreatProperty = typeof(PetControllerBoard).GetProperty("Treat", InstanceMembers);
+        private static readonly PropertyInfo ToyProperty = typeof(PetControllerBoard).GetProperty("Toy", InstanceMembers);
         private static readonly MethodInfo InitializeMethod = typeof(PetControllerGame).GetMethod("Initialize", InstanceMembers);
         private static readonly FieldInfo MouseDownField = typeof(PetInputManager).GetField("m_mouseDownOnPetInteractable", InstanceMembers);
         private static readonly FieldInfo MouseHoverField = typeof(PetInputManager).GetField("m_mouseHoverOnPetInteractable", InstanceMembers);
+        private static readonly FieldInfo ItemButtonOwnerField = typeof(PetItemButton).GetField("m_ownerPet", InstanceMembers);
+        private static readonly FieldInfo TreatGameModeField = typeof(PetTreat).GetField("m_isGameMode", InstanceMembers);
+        private static readonly FieldInfo TreatEnabledField = typeof(PetTreat).GetField("m_isTreatEnabled", InstanceMembers);
+        private static readonly FieldInfo TreatServerLimitField = typeof(PetTreat).GetField("m_serverMaxTreatsPerGame", InstanceMembers);
+        private static readonly PropertyInfo TreatCountProperty = typeof(PetTreat).GetProperty("TreatCount", InstanceMembers);
 
         private static GameObject spawnedContainer;
         private static GameObject spawnedModel;
         private static PetControllerGame spawnedController;
         private static int spawnedVariant = -1;
         private static float nextSpawnAttempt;
+
+        internal static bool IsInitializingLocalPet { get; private set; }
 
         public static void Init()
         {
@@ -86,14 +95,17 @@ namespace HsMod
 
                 ZoneCosmetic zone = ZoneMgr.Get()?.FindZoneOfType<ZoneCosmetic>(Player.Side.FRIENDLY);
                 Transform petPosition = zone?.PetPosition;
+                Transform treatPosition = zone?.TreatPosition;
+                Transform toyPosition = zone?.ToyPosition;
                 Actor ownerActor = friendlyPlayer.GetHero()?.GetCard()?.GetActor();
-                if (petPosition == null || ownerActor == null || InputManager.Get()?.PetInputManager == null)
+                if (petPosition == null || treatPosition == null || toyPosition == null || ownerActor == null ||
+                    InputManager.Get()?.PetInputManager == null)
                 {
                     DelayRetry();
                     return;
                 }
 
-                if (!TrySpawn(variant, friendlyPlayer, ownerActor, petPosition))
+                if (!TrySpawn(variant, friendlyPlayer, ownerActor, petPosition, treatPosition, toyPosition))
                 {
                     DelayRetry();
                     return;
@@ -145,11 +157,14 @@ namespace HsMod
             }
         }
 
-        private static bool TrySpawn(int variant, Player friendlyPlayer, Actor ownerActor, Transform petPosition)
+        private static bool TrySpawn(int variant, Player friendlyPlayer, Actor ownerActor, Transform petPosition,
+            Transform treatPosition, Transform toyPosition)
         {
             GameObject container = null;
             GameObject model = null;
             PetControllerGame controller = null;
+            PetItem treat = null;
+            PetItem toy = null;
 
             try
             {
@@ -212,9 +227,25 @@ namespace HsMod
                 modelManager.HeroModel?.SetVisible(true);
                 modelManager.DummyModel?.SetVisible(false);
 
-                // Calls only the protected initialization chain. Do not replace this with
-                // CreatePetObject(): its PetControllerGame override sends a network request.
-                InitializeMethod.Invoke(controller, null);
+                IsInitializingLocalPet = true;
+                try
+                {
+                    toy = CreateLocalItem(handler.GetToyAssetPath(), toyPosition, controller, isTreat: false);
+                    if (toy != null)
+                        SetValue(ToyProperty, controller, toy);
+
+                    treat = CreateLocalItem(handler.GetTreatAssetPath(), treatPosition, controller, isTreat: true);
+                    if (treat != null)
+                        SetValue(TreatProperty, controller, treat);
+
+                    // Calls only the protected initialization chain. Do not replace this with
+                    // CreatePetObject(): its PetControllerGame override sends a network request.
+                    InitializeMethod.Invoke(controller, null);
+                }
+                finally
+                {
+                    IsInitializingLocalPet = false;
+                }
 
                 PetLocationTags locationTags = modelManager.HeroModel?.GameObject?.GetComponent<PetLocationTags>();
                 SetValue(LocationTagsField, controller, locationTags);
@@ -228,13 +259,63 @@ namespace HsMod
                 spawnedController = controller;
                 spawnedVariant = variant;
                 nextSpawnAttempt = 0f;
+                Utils.MyLogger(BepInEx.Logging.LogLevel.Warning,
+                    $"[petspoof] local items ready (toy={toy != null} treat={treat != null})");
                 return true;
             }
             catch (Exception ex)
             {
+                IsInitializingLocalPet = false;
                 Utils.MyLogger(BepInEx.Logging.LogLevel.Error, Unwrap(ex));
+                DestroyItem(treat);
+                DestroyItem(toy);
                 DestroyLocalPet(controller, container, model);
                 return false;
+            }
+        }
+
+        private static PetItem CreateLocalItem(string assetPath, Transform anchor, PetControllerGame controller, bool isTreat)
+        {
+            if (string.IsNullOrWhiteSpace(assetPath))
+            {
+                Utils.MyLogger(BepInEx.Logging.LogLevel.Warning,
+                    $"[petspoof] selected pet has no {(isTreat ? "treat" : "toy")} asset");
+                return null;
+            }
+
+            GameObject itemObject = AssetLoader.Get()?.InstantiatePrefab(assetPath, default(AssetLoadingOptions));
+            if (itemObject == null)
+                throw new InvalidOperationException($"Cannot instantiate local pet {(isTreat ? "treat" : "toy")}");
+
+            try
+            {
+                PetItem item = itemObject.GetComponent<PetItem>();
+                if (item == null)
+                    throw new InvalidOperationException($"Pet {(isTreat ? "treat" : "toy")} asset has no PetItem component");
+
+                itemObject.transform.SetPositionAndRotation(anchor.position, anchor.rotation);
+                item.InitializeItem(controller);
+
+                if (isTreat)
+                {
+                    PetTreat localTreat = item as PetTreat;
+                    if (localTreat == null)
+                        throw new InvalidOperationException("Pet treat asset has no PetTreat component");
+
+                    // Initialization is patched to suppress its initial generation request.
+                    // From this point onward the treat remains in client-only mode.
+                    SetValue(TreatGameModeField, localTreat, false);
+                    SetValue(TreatServerLimitField, localTreat, 0);
+                    SetValue(TreatEnabledField, localTreat, true);
+                    SetValue(TreatCountProperty, localTreat, 1);
+                }
+
+                return item;
+            }
+            catch
+            {
+                UnityEngine.Object.Destroy(itemObject);
+                throw;
             }
         }
 
@@ -269,6 +350,7 @@ namespace HsMod
             spawnedModel = null;
             spawnedVariant = -1;
             nextSpawnAttempt = 0f;
+            IsInitializingLocalPet = false;
 
             DestroyLocalPet(controller, container, model);
         }
@@ -305,8 +387,30 @@ namespace HsMod
 
         private static void ClearInputReference(PetInputManager input, FieldInfo field, PetControllerGame controller)
         {
-            if (field != null && ReferenceEquals(field.GetValue(input), controller))
+            if (field == null)
+                return;
+
+            object interactable = field.GetValue(input);
+            bool belongsToController = ReferenceEquals(interactable, controller);
+            if (interactable is PetItem item)
+                belongsToController |= item.OwnerPet == controller;
+            else if (interactable is PetItemButton button && ItemButtonOwnerField != null)
+                belongsToController |= ReferenceEquals(ItemButtonOwnerField.GetValue(button), controller);
+
+            if (belongsToController)
                 field.SetValue(input, null);
+        }
+
+        private static void DestroyItem(PetItem item)
+        {
+            try
+            {
+                if (item != null)
+                    UnityEngine.Object.Destroy(item.gameObject);
+            }
+            catch
+            {
+            }
         }
 
         private static void DelayRetry()
@@ -318,7 +422,9 @@ namespace HsMod
         {
             if (ActorField == null || ModelManagerField == null || LocationTagsField == null || PetObjectProperty == null ||
                 DataHandlerProperty == null || PetIdProperty == null || PetVariantIdProperty == null ||
-                PlayerIdProperty == null || IsOverridenProperty == null || InitializeMethod == null)
+                PlayerIdProperty == null || IsOverridenProperty == null || TreatProperty == null || ToyProperty == null ||
+                TreatGameModeField == null || TreatEnabledField == null || TreatServerLimitField == null ||
+                TreatCountProperty == null || InitializeMethod == null)
             {
                 throw new MissingMemberException("Hearthstone pet controller contract has changed");
             }
