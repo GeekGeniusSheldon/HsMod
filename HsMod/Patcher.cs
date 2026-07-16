@@ -207,6 +207,8 @@ namespace HsMod
             LoadPatch(typeof(Patcher.PatchFavorite));
             LoadPatch(typeof(Patcher.PatchFakeDevice));
             LoadPatch(typeof(Patcher.PatchDevOptioins));
+            LoadPatch(typeof(Patcher.PatchGameMenu));
+            LoadPatch(typeof(Patcher.PatchBgRank));
             if (isShowCardLargeCount.Value)
             {
                 LoadPatch(typeof(Patcher.PatchRealtimeCardNum));

@@ -160,6 +160,18 @@ namespace HsMod
                 Utils.TryGetSafeImg();
             }
 
+            //游戏内配置菜单
+            ModSettingsUI.Init();
+
+            //酒馆战棋对手MMR显示
+            BgRankOverlay.Init();
+
+            //酒馆战棋对局统计
+            BgSessionStats.Init();
+
+            //酒馆战棋自动静默
+            BgAutoSquelch.Init();
+
             //启动web服务
             WebServer.Start();
 
@@ -189,9 +201,16 @@ namespace HsMod
             }
 
             if (!isPluginEnable.Value) return;
+            if (ModSettingsUI.IsVisible) return;    //配置菜单打开时禁用快捷键，避免输入文本触发
             if (!isShortcutsEnable.Value || !Input.anyKey) return;
             else
             {
+                try
+                {
+                    //聊天等文本输入激活时禁用全部快捷键（否则打字会触发快捷键，例如酒馆商店的R/F/U/H）
+                    if (UniversalInputManager.Get()?.IsTextInputActive() == true) return;
+                }
+                catch { }
                 if (keyTimeGearUp.Value.IsDown())
                 {
                     if (timeGear.Value == 8) return;
@@ -255,6 +274,41 @@ namespace HsMod
                     }
 
                     if (GameState.Get() == null || GameMgr.Get() == null) return;
+                    //酒馆商店快捷键（仅购物阶段有效）
+                    if (GameMgr.Get().IsBattlegrounds() && GameState.Get().IsMainPhase())
+                    {
+                        if (keyBgsRefresh.Value.IsDown())
+                        {
+                            Utils.ClickBgsShopButton(Utils.BgsShopButton.Refresh);
+                            return;
+                        }
+                        if (keyBgsFreeze.Value.IsDown())
+                        {
+                            Utils.ClickBgsShopButton(Utils.BgsShopButton.Freeze);
+                            return;
+                        }
+                        if (keyBgsUpgrade.Value.IsDown())
+                        {
+                            Utils.ClickBgsShopButton(Utils.BgsShopButton.Upgrade);
+                            return;
+                        }
+                        if (keyBgsHeroPower.Value.IsDown())
+                        {
+                            Utils.ClickBgsShopButton(Utils.BgsShopButton.HeroPower);
+                            return;
+                        }
+                        //双人模式：显示/隐藏队友棋盘
+                        if (keyBgsTeammateBoard.Value.IsDown() && GameMgr.Get().IsBattlegroundDuoGame())
+                        {
+                            TeammateBoardViewer viewer = TeammateBoardViewer.Get();
+                            if (viewer != null)
+                            {
+                                if (viewer.IsViewingTeammate()) viewer.HideTeammateBoard();
+                                else viewer.ShowTeammateBoard();
+                            }
+                            return;
+                        }
+                    }
                     if (GameMgr.Get().IsBattlegrounds() && keyShutUpBob.Value.IsDown())
                     {
                         isShutUpBobEnable.Value = !isShutUpBobEnable.Value;

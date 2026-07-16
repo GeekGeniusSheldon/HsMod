@@ -388,7 +388,7 @@ namespace HsMod
                                         if (hintText != null)
                                         {
                                             hintText = hintText + "\n" + entityDef.GetCardTextInHand();
-                                            UIStatus.Get().AddInfo($"注意: {hintText}", 15f);
+                                            UIStatus.Get().AddInfo($"{LocalizationManager.GetLangValue("info.notice")}{hintText}", 15f);
                                         }
                                     }
                                 }
@@ -411,7 +411,7 @@ namespace HsMod
                         string hintText2 = string.Join(" ", hintList);
                         if (hintText2 != "")
                         {
-                            UIStatus.Get().AddInfo($"注意: {hintText2}", 15f);
+                            UIStatus.Get().AddInfo($"{LocalizationManager.GetLangValue("info.notice")}{hintText2}", 15f);
                         }
                     }
 
