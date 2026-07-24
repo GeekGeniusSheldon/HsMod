@@ -8,6 +8,8 @@ namespace HsMod
 {
     public static class PluginConfig
     {
+        public static bool isDebug = false;
+
         public static ConfigEntry<bool> isPluginEnable;
         public static ConfigEntry<string> pluginInitLanague;
         public static ConfigEntry<Locale> pluginLanague;
