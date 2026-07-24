@@ -134,6 +134,7 @@ namespace HsMod
         public static ConfigEntry<string> hsMatchLogPath;
         public static ConfigEntry<string> hsLogPath;
         public static ConfigEntry<long> autoQuitTimer;    // 定时退出
+        public static ConfigEntry<long> autoRefershQuestTimer;
 
         public static ConfigEntry<Utils.DevicePreset> fakeDevicePreset;
         public static ConfigEntry<OSCategory> fakeDeviceOs;
@@ -319,6 +320,7 @@ namespace HsMod
             hsLogPath = config.Bind(LocalizationManager.GetLangValue("hsLogPath.label"), LocalizationManager.GetLangValue("hsLogPath.name"), "", new ConfigDescription(LocalizationManager.GetLangValue("hsLogPath.description"), null, new object[] { "Advanced" }));
             hsMatchLogPath = config.Bind(LocalizationManager.GetLangValue("hsMatchLogPath.label"), LocalizationManager.GetLangValue("hsMatchLogPath.name"), Path.Combine(BepInEx.Paths.BepInExRootPath, "HsMod", "match.log"), LocalizationManager.GetLangValue("hsMatchLogPath.description"));
             autoQuitTimer = config.Bind(LocalizationManager.GetLangValue("autoQuitTimer.label"), LocalizationManager.GetLangValue("autoQuitTimer.name"), (long)0, LocalizationManager.GetLangValue("autoQuitTimer.description"));
+            autoRefershQuestTimer = config.Bind(LocalizationManager.GetLangValue("autoRefershQuestTimer.label"), LocalizationManager.GetLangValue("autoRefershQuestTimer.name"), (long)0, LocalizationManager.GetLangValue("autoRefershQuestTimer.description"));
             isFakeOpenEnable = config.Bind(LocalizationManager.GetLangValue("isFakeOpenEnable.label"), LocalizationManager.GetLangValue("isFakeOpenEnable.name"), false, LocalizationManager.GetLangValue("isFakeOpenEnable.description"));
             buyAdventure = config.Bind(LocalizationManager.GetLangValue("buyAdventure.label"), LocalizationManager.GetLangValue("buyAdventure.name"), Utils.BuyAdventureTemplate.DoNothing, LocalizationManager.GetLangValue("buyAdventure.description"));
             isKarazhanFixEnable = config.Bind(LocalizationManager.GetLangValue("isKarazhanFixEnable.label"), LocalizationManager.GetLangValue("isKarazhanFixEnable.name"), false, LocalizationManager.GetLangValue("isKarazhanFixEnable.description"));
