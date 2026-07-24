@@ -13,6 +13,10 @@ namespace HsMod
             {
                 return powerList;
             }
+            if (GameMgr.Get().IsMercenaries())
+            {
+                return powerList;
+            }
             Utils.HandlePowerHistoryTagChange(powerList);
             List<Network.PowerHistory> list = new List<Network.PowerHistory>();
             for (int i = 0; i < powerList.Count; i++)
@@ -136,7 +140,7 @@ namespace HsMod
         public static void HandlePowerHistoryTagChange(List<Network.PowerHistory> powerList)
         {
             GameState gameState = GameState.Get();
-            if (gameState == null)
+            if (gameState == null || powerList == null)
             {
                 return;
             }
@@ -432,6 +436,11 @@ namespace HsMod
 
         public static void HandleEmote(EmoteType emoteType)
         {
+
+            if (GameMgr.Get().IsMercenaries())
+            {
+                return;
+            }
             GameState gameState = GameState.Get();
             if (gameState == null)
             {
