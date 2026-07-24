@@ -119,6 +119,7 @@ namespace HsMod
         public static ConfigEntry<int> skinBob;
         public static ConfigEntry<int> skinHero;
         public static ConfigEntry<int> skinOpposingHero;
+        public static ConfigEntry<bool> isFakePet;
         public static ConfigEntry<int> skinPet;
         public static ConfigEntry<int> skinOpposingPet;
         public static ConfigEntry<bool> isSkinDefalutHeroEnable;
@@ -277,6 +278,7 @@ namespace HsMod
             skinBgsBoard = config.Bind(LocalizationManager.GetLangValue("skinBgsBoard.label"), LocalizationManager.GetLangValue("skinBgsBoard.name"), -1, LocalizationManager.GetLangValue("skinBgsBoard.description"));
             skinBgsFinisher = config.Bind(LocalizationManager.GetLangValue("skinBgsFinisher.label"), LocalizationManager.GetLangValue("skinBgsFinisher.name"), -1, LocalizationManager.GetLangValue("skinBgsFinisher.description"));
             skinBob = config.Bind(LocalizationManager.GetLangValue("skinBob.label"), LocalizationManager.GetLangValue("skinBob.name"), -1, LocalizationManager.GetLangValue("skinBob.description"));
+            isFakePet = config.Bind(LocalizationManager.GetLangValue("isFakePet.label"), LocalizationManager.GetLangValue("isFakePet.name"), false, LocalizationManager.GetLangValue("isFakePet.description"));
             skinPet = config.Bind(LocalizationManager.GetLangValue("skinPet.label"), LocalizationManager.GetLangValue("skinPet.name"), -1, LocalizationManager.GetLangValue("skinPet.description"));
             skinOpposingPet = config.Bind(LocalizationManager.GetLangValue("skinOpposingPet.label"), LocalizationManager.GetLangValue("skinOpposingPet.name"), -1, LocalizationManager.GetLangValue("skinOpposingPet.description"));
             isSkinDefalutHeroEnable = config.Bind(LocalizationManager.GetLangValue("isSkinDefalutHeroEnable.label"), LocalizationManager.GetLangValue("isSkinDefalutHeroEnable.name"), false, LocalizationManager.GetLangValue("isSkinDefalutHeroEnable.description"));
