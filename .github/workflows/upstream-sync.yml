@@ -62,6 +62,7 @@ jobs:
 
           # 1) Keep a dedicated mirror branch that always points at upstream head.
           git checkout -B $env:SYNC_BRANCH upstream/$env:UPSTREAM_BRANCH
+          Remove-Item -Recurse -Force .github/workflows -ErrorAction SilentlyContinue
           git push --force-with-lease origin $env:SYNC_BRANCH
 
           # 2) Return to build branch and decide whether there is new upstream content to merge.
