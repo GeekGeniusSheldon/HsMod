@@ -29,13 +29,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout build branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ env.BUILD_BRANCH }}
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.x
 
@@ -57,7 +57,20 @@ jobs:
 
           # 1) Keep a dedicated mirror branch that always points at upstream head.
           git checkout -B $env:SYNC_BRANCH upstream/$env:UPSTREAM_BRANCH
-          Remove-Item -Recurse -Force .github/workflows -ErrorAction SilentlyContinue
+
+          # Remove upstream workflows to avoid GitHub Actions workflow permission error
+          if (Test-Path ".github/workflows") {
+              git rm -r --cached .github/workflows
+              Remove-Item -Recurse -Force .github/workflows
+          }
+
+          git add -A
+
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+              git commit -m "Remove upstream workflows"
+          }
+
           git push --force-with-lease origin $env:SYNC_BRANCH
 
           # 2) Return to build branch and decide whether there is new upstream content to merge.
