@@ -23,11 +23,7 @@ on:
 concurrency:
   group: upstream-sync-bepinex5
   cancel-in-progress: false
-  
-permissions:
-  actions: write
-  workflows: write
-  
+
 jobs:
   sync_and_build:
     runs-on: windows-latest
